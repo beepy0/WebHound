@@ -39,6 +39,7 @@ class ViewTestMixin(object):
         data={},
         args=[],
         kwargs={},
+        template=None,
         status_code=200,
     ):
         """Initiates a call and tests the outcome."""
@@ -61,6 +62,8 @@ class ViewTestMixin(object):
                 raise Exception('Could not resolve "{}".'.format(resp.url))
         else:
             self.assertEqual(resp.status_code, status_code)
+        if template:
+            self.is_viewable(resp.url if to else self.class_url, template)
 
     def is_not_callable(self, **kwargs):
         """Tests if call raises a 404."""
@@ -70,33 +73,34 @@ class ViewTestMixin(object):
     def is_viewable(
         self,
         url,
-        template,
-        status_code=200
+        template
     ):
         """Makes a get call and verifies the right template is used"""
-        resp = self.client.get(reverse(url))
-        self.assertEqual(resp.status_code, status_code)
-        self.assertTemplateUsed(resp, self.template_path.format(template))
+        self.assertTemplateUsed(self.client.get(url), f"{self.app_name}/{template}.html")
 
 
-class HoundReleaseTestCase(ViewTestMixin, TestCase):
+class HoundTraceTestCase(ViewTestMixin, TestCase):
     view_class = views.HoundTrace
-    template_path = 'WebHoundApp/{}.html'
-
-    def test_template(self):
-        self.is_viewable(url='WebHoundApp:hound_trace', template='hound_trace')
+    app_name = 'WebHoundApp'
+    class_url = reverse(f"{app_name}:hound_trace")
 
     def test_get(self):
         self.is_callable()
 
+    def test_get_template(self):
+        self.is_callable(template='hound_trace')
+
     def test_post(self):
         self.is_callable(post=True)
 
+    def test_post_template(self):
+        self.is_callable(post=True, template='hound_trace')
+
     def test_post_no_data(self):
-        self.is_callable(post=True, data={'query': ''}, status_code=200)
+        self.is_callable(post=True, data={'query': ''}, template='hound_trace', status_code=200)
 
     def test_post_with_data(self):
-        self.is_callable(post=True, data={'query': 'dummy_name'}, to='hound_name')
+        self.is_callable(post=True, data={'query': 'dummy_name'}, to='hound_name', template='hound_name')
 
 
 class HoundCallBackTestCase(ViewTestMixin, TestCase):
