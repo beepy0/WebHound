@@ -4,6 +4,6 @@ from .views import HoundTrace, HoundName
 
 app_name = 'WebHoundApp'
 urlpatterns = [
-    path('trace/', HoundTrace.as_view(), name='release_hound'),
-    path('ticket/', HoundName.as_view(), name='name_hound'),
+    path('trace/', HoundTrace.as_view(), name='hound_trace'),
+    path('name/', HoundName.as_view(), name='hound_name'),
 ]
