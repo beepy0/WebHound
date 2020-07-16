@@ -105,3 +105,4 @@ class HoundTraceTestCase(ViewTestMixin, TestCase):
 
 class HoundCallBackTestCase(ViewTestMixin, TestCase):
     view_class = views.HoundName
+
