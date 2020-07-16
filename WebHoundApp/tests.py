@@ -6,6 +6,7 @@ from django.urls import resolve, reverse
 from django.urls.exceptions import Resolver404
 
 from . import views
+from .models import Trace
 
 
 class ViewTestMixin(object):
@@ -34,7 +35,7 @@ class ViewTestMixin(object):
     def is_callable(
         self,
         user=None,
-        post=False,
+        req=None,
         to=None,
         data={},
         args=[],
@@ -45,7 +46,7 @@ class ViewTestMixin(object):
         """Initiates a call and tests the outcome."""
         view_kwargs = kwargs or self.get_view_kwargs()
         resp = self.get_response(
-            'post' if post else 'get',
+            req if req else 'get',
             user=user,
             data=data,
             args=args,
@@ -91,18 +92,33 @@ class HoundTraceTestCase(ViewTestMixin, TestCase):
         self.is_callable(template='hound_trace')
 
     def test_post(self):
-        self.is_callable(post=True)
+        self.is_callable(req='post')
 
     def test_post_template(self):
-        self.is_callable(post=True, template='hound_trace')
+        self.is_callable(req='post', template='hound_trace')
 
     def test_post_no_data(self):
-        self.is_callable(post=True, data={'query': ''}, template='hound_trace', status_code=200)
+        self.is_callable(req='post', data={'query': ''}, template='hound_trace', status_code=200)
 
     def test_post_with_data(self):
-        self.is_callable(post=True, data={'query': 'dummy_name'}, to='hound_name', template='hound_name')
+        self.is_callable(req='post', data={'query': 'dummy_name'}, to='hound_name', template='hound_name')
 
 
 class HoundCallBackTestCase(ViewTestMixin, TestCase):
     view_class = views.HoundName
+    app_name = 'WebHoundApp'
+    # to be adjusted when the need for a redirect comes
+    class_url = reverse(f"{app_name}:hound_name", kwargs={'pk': 'tmp'}).split('tmp')[0]
 
+    def test_get(self):
+        self.is_callable(status_code=404, kwargs={'pk': 'no_such_user'})
+        Trace(name='dummy_user').save()
+        self.is_callable(kwargs={'pk': 'dummy_user'})
+
+    def test_post(self):
+        Trace(name='dummy_user').save()
+        self.is_callable(req='post', status_code=405, kwargs={'pk': 'dummy_user'})
+
+    def test_put(self):
+        Trace(name='dummy_user').save()
+        self.is_callable(req='put', status_code=405, kwargs={'pk': 'dummy_user'})
