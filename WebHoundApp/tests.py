@@ -41,6 +41,7 @@ class ViewTestMixin(object):
         args=[],
         kwargs={},
         template=None,
+        route=None,
         status_code=200,
     ):
         """Initiates a call and tests the outcome."""
@@ -64,7 +65,9 @@ class ViewTestMixin(object):
         else:
             self.assertEqual(resp.status_code, status_code)
         if template:
-            self.is_viewable(resp.url if to else self.class_url, template)
+            # resp.url is only given on a redirect, otherwise it has to be constructed
+            url = resp.url if to else reverse(f"{self.app_name}:{route}", kwargs=kwargs)
+            self.is_viewable(url, template)
 
     def is_not_callable(self, **kwargs):
         """Tests if call raises a 404."""
@@ -83,37 +86,39 @@ class ViewTestMixin(object):
 class HoundTraceTestCase(ViewTestMixin, TestCase):
     view_class = views.HoundTrace
     app_name = 'WebHoundApp'
-    class_url = reverse(f"{app_name}:hound_trace")
 
     def test_get(self):
         self.is_callable()
 
     def test_get_template(self):
-        self.is_callable(template='hound_trace')
+        self.is_callable(template='hound_trace', route='hound_trace')
 
     def test_post(self):
         self.is_callable(req='post')
 
     def test_post_template(self):
-        self.is_callable(req='post', template='hound_trace')
+        self.is_callable(req='post', template='hound_trace', route='hound_trace')
 
     def test_post_no_data(self):
-        self.is_callable(req='post', data={'query': ''}, template='hound_trace', status_code=200)
+        self.is_callable(req='post', data={'query': ''}, template='hound_trace', route='hound_trace',
+                         status_code=200)
 
     def test_post_with_data(self):
-        self.is_callable(req='post', data={'query': 'dummy_name'}, to='hound_name', template='hound_name')
+        self.is_callable(req='post', data={'query': 'dummy_name'}, to='hound_name',
+                         template='hound_name', route='hound_trace')
 
 
 class HoundCallBackTestCase(ViewTestMixin, TestCase):
     view_class = views.HoundName
     app_name = 'WebHoundApp'
-    # to be adjusted when the need for a redirect comes
-    class_url = reverse(f"{app_name}:hound_name", kwargs={'pk': 'tmp'}).split('tmp')[0]
+    # initializing this way gets rid of the route parameter but can add redundancy
+    # if we need to change the route in a specific test
+    # class_url = reverse(f"{app_name}:hound_name", kwargs={'pk': 'tmp'}).split('tmp')[0]
 
     def test_get(self):
-        self.is_callable(status_code=404, kwargs={'pk': 'no_such_user'})
+        self.is_callable(req='get', status_code=404, kwargs={'pk': 'no_such_user'})
         Trace(name='dummy_user').save()
-        self.is_callable(kwargs={'pk': 'dummy_user'})
+        self.is_callable(req='get', kwargs={'pk': 'dummy_user'}, template='hound_name', route='hound_name')
 
     def test_post(self):
         Trace(name='dummy_user').save()
@@ -122,3 +127,10 @@ class HoundCallBackTestCase(ViewTestMixin, TestCase):
     def test_put(self):
         Trace(name='dummy_user').save()
         self.is_callable(req='put', status_code=405, kwargs={'pk': 'dummy_user'})
+
+    def test_delete(self):
+        Trace(name='dummy_user').save()
+        self.is_callable(req='get', kwargs={'pk': 'dummy_user'}, template='hound_name', route='hound_name')
+        self.is_callable(req='delete', kwargs={'pk': 'dummy_user', 'name': 'dummy_user'},
+                         to='hound_deleted', template='hound_deleted', route='hound_deleted')
+        self.is_callable(req='get', status_code=404, kwargs={'pk': 'dummy_user'})

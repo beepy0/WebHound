@@ -1,7 +1,8 @@
-import os
-from django.shortcuts import render, HttpResponse
+from django.urls import reverse
+from django.http import HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404
 from django.views.generic.edit import FormView
-from django.views.generic import TemplateView
+from django.views.generic.base import View
 from rest_framework import generics
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
@@ -33,4 +34,15 @@ class HoundName(generics.GenericAPIView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        return Response(template_name="WebHoundApp/hound_name.html")
+        return Response(template_name="WebHoundApp/hound_name.html", data=kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        self.lookup_field = 'name'
+        get_object_or_404(self.queryset, pk=kwargs['name']).delete()
+        return HttpResponseRedirect(reverse('WebHoundApp:hound_deleted'))
+
+
+class HoundDeleted(View):
+
+    def get(self, request):
+        return render(request, 'WebHoundApp/hound_deleted.html')
