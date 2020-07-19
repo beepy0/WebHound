@@ -124,6 +124,7 @@ class HoundCallBackTestCase(ViewTestMixin, TestCase):
         Trace(name='dummy_user').save()
         self.is_callable(req='post', status_code=405, kwargs={'pk': 'dummy_user'})
 
+    # TODO test retry trace here
     def test_put(self):
         Trace(name='dummy_user').save()
         self.is_callable(req='put', status_code=405, kwargs={'pk': 'dummy_user'})
@@ -131,6 +132,19 @@ class HoundCallBackTestCase(ViewTestMixin, TestCase):
     def test_delete(self):
         Trace(name='dummy_user').save()
         self.is_callable(req='get', kwargs={'pk': 'dummy_user'}, template='hound_name', route='hound_name')
-        self.is_callable(req='delete', kwargs={'pk': 'dummy_user', 'name': 'dummy_user'},
+        self.is_callable(req='delete', kwargs={'pk': 'dummy_user'},
                          to='hound_deleted', template='hound_deleted', route='hound_deleted')
         self.is_callable(req='get', status_code=404, kwargs={'pk': 'dummy_user'})
+
+
+class HoundDeleteTestCase(ViewTestMixin, TestCase):
+    view_class = views.HoundDelete
+    app_name = 'WebHoundApp'
+
+    def test_get(self):
+        self.is_callable(req='get', kwargs={'pk': 'deleted_dummy_user'},
+                         template='hound_deleted', route='hound_deleted')
+
+    def test_get_no_data(self):
+        with self.assertRaises(Http404, msg='No trace name supplied'):
+            self.is_callable(req='get')

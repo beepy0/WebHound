@@ -1,5 +1,5 @@
 from django.urls import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404
 from django.views.generic.edit import FormView
 from django.views.generic.base import View
@@ -37,12 +37,14 @@ class HoundName(generics.GenericAPIView):
         return Response(template_name="WebHoundApp/hound_name.html", data=kwargs)
 
     def delete(self, request, *args, **kwargs):
-        self.lookup_field = 'name'
-        get_object_or_404(self.queryset, pk=kwargs['name']).delete()
-        return HttpResponseRedirect(reverse('WebHoundApp:hound_deleted'))
+        # self.lookup_field = 'name'
+        get_object_or_404(self.queryset, pk=kwargs['pk']).delete()
+        return HttpResponseRedirect(reverse('WebHoundApp:hound_deleted', kwargs={'pk': kwargs['pk']}))
 
 
-class HoundDeleted(View):
+class HoundDelete(View):
 
-    def get(self, request):
-        return render(request, 'WebHoundApp/hound_deleted.html')
+    def get(self, request, *args, **kwargs):
+        if kwargs == {}:
+            raise Http404('No trace name supplied')
+        return render(request, 'WebHoundApp/hound_deleted.html', context=kwargs)
