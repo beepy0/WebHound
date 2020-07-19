@@ -3,12 +3,15 @@ from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404
 from django.views.generic.edit import FormView
 from django.views.generic.base import View
+from django.contrib import messages
 from rest_framework import generics
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 
 from .forms import QueryForm
 from .models import Trace
+from .serializers import TraceSerializer
+from .config import msgs
 
 
 # Create your views here.
@@ -34,7 +37,10 @@ class HoundName(generics.GenericAPIView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        return Response(template_name="WebHoundApp/hound_name.html", data=kwargs)
+        trace = TraceSerializer(self.object)
+        if trace.data['was_traced'] is False:
+            messages.info(request, msgs['trace_not_done'])
+        return Response(template_name="WebHoundApp/hound_name.html", data=trace.data)
 
     def delete(self, request, *args, **kwargs):
         # self.lookup_field = 'name'

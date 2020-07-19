@@ -4,6 +4,8 @@ from django.http import Http404
 from django.test import RequestFactory, TestCase
 from django.urls import resolve, reverse
 from django.urls.exceptions import Resolver404
+from django.contrib.messages.middleware import MessageMiddleware
+from django.contrib.sessions.middleware import SessionMiddleware
 
 from . import views
 from .models import Trace
@@ -14,6 +16,17 @@ class ViewTestMixin(object):
     longMessage = True  # More verbose error messages
     view_class = None
 
+    def annotate_req(self, req):
+        """Annotate a request object with a session"""
+        middleware = SessionMiddleware()
+        middleware.process_request(req)
+        req.session.save()
+
+        """Annotate a request object with a messages"""
+        middleware = MessageMiddleware()
+        middleware.process_request(req)
+        req.session.save()
+
     def get_view_kwargs(self):
         """
         Returns a dictionary representing the view's kwargs, if necessary.
@@ -22,13 +35,16 @@ class ViewTestMixin(object):
         """
         return {}
 
-    def get_response(self, method, user, data, args, kwargs):
+    def get_response(self, method, anno, user, data, args, kwargs):
         """Creates a request and a response object."""
         factory = RequestFactory()
         req_kwargs = {}
         if data:
             req_kwargs.update({'data': data})
         req = getattr(factory, method)('/', **req_kwargs)
+        # requests that use messages need extra annotation
+        if anno is True:
+            self.annotate_req(req)
         req.user = user if user else AnonymousUser()
         return self.view_class.as_view()(req, *args, **kwargs)
 
@@ -36,6 +52,7 @@ class ViewTestMixin(object):
         self,
         user=None,
         req=None,
+        anno=False,
         to=None,
         data={},
         args=[],
@@ -48,6 +65,7 @@ class ViewTestMixin(object):
         view_kwargs = kwargs or self.get_view_kwargs()
         resp = self.get_response(
             req if req else 'get',
+            anno,
             user=user,
             data=data,
             args=args,
@@ -116,9 +134,9 @@ class HoundCallBackTestCase(ViewTestMixin, TestCase):
     # class_url = reverse(f"{app_name}:hound_name", kwargs={'pk': 'tmp'}).split('tmp')[0]
 
     def test_get(self):
-        self.is_callable(req='get', status_code=404, kwargs={'pk': 'no_such_user'})
+        self.is_callable(req='get', anno=True, status_code=404, kwargs={'pk': 'no_such_user'})
         Trace(name='dummy_user').save()
-        self.is_callable(req='get', kwargs={'pk': 'dummy_user'}, template='hound_name', route='hound_name')
+        self.is_callable(req='get', anno=True, kwargs={'pk': 'dummy_user'}, template='hound_name', route='hound_name')
 
     def test_post(self):
         Trace(name='dummy_user').save()
@@ -131,10 +149,10 @@ class HoundCallBackTestCase(ViewTestMixin, TestCase):
 
     def test_delete(self):
         Trace(name='dummy_user').save()
-        self.is_callable(req='get', kwargs={'pk': 'dummy_user'}, template='hound_name', route='hound_name')
+        self.is_callable(req='get', anno=True, kwargs={'pk': 'dummy_user'}, template='hound_name', route='hound_name')
         self.is_callable(req='delete', kwargs={'pk': 'dummy_user'},
                          to='hound_deleted', template='hound_deleted', route='hound_deleted')
-        self.is_callable(req='get', status_code=404, kwargs={'pk': 'dummy_user'})
+        self.is_callable(req='get', anno=True, status_code=404, kwargs={'pk': 'dummy_user'})
 
 
 class HoundDeleteTestCase(ViewTestMixin, TestCase):
