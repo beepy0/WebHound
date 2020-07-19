@@ -166,3 +166,23 @@ class HoundDeleteTestCase(ViewTestMixin, TestCase):
     def test_get_no_data(self):
         with self.assertRaises(Http404, msg='No trace name supplied'):
             self.is_callable(req='get')
+
+
+class SherlockTaskTestCase(TestCase):
+    def test_no_trace(self):
+        # check if object exists
+        # if not, raise NoObjectException
+        assert 0
+
+    def test_trace_proper(self):
+        assert 0
+
+    def test_trace_duplicate(self):
+        # a task queries object and checks "is_task_active"
+        # if yes, it checks if "task_active_date" is older than 10 minutes
+        # if no, it is a duplicate -> complete task
+        # if yes, previous task likely crashed -> take over trace and update "task_active_date"
+        assert 0
+
+    def test_trace_already_done(self):
+        assert 0
