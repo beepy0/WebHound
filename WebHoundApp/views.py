@@ -38,7 +38,6 @@ class HoundName(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         trace = TraceSerializer(self.object)
-        print(trace.data)
         if trace.data['was_traced'] is False:
             messages.info(request, msgs['trace_not_done'])
         return Response(template_name="WebHoundApp/hound_name.html", data=trace.data)
