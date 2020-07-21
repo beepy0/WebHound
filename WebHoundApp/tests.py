@@ -129,9 +129,6 @@ class HoundTraceTestCase(ViewTestMixin, TestCase):
 class HoundCallBackTestCase(ViewTestMixin, TestCase):
     view_class = views.HoundName
     app_name = 'WebHoundApp'
-    # initializing this way gets rid of the route parameter but can add redundancy
-    # if we need to change the route in a specific test
-    # class_url = reverse(f"{app_name}:hound_name", kwargs={'pk': 'tmp'}).split('tmp')[0]
 
     def test_get(self):
         self.is_callable(req='get', anno=True, status_code=404, kwargs={'pk': 'no_such_user'})
@@ -168,21 +165,21 @@ class HoundDeleteTestCase(ViewTestMixin, TestCase):
             self.is_callable(req='get')
 
 
-# class SherlockTaskTestCase(TestCase):
-#     def test_no_trace(self):
-#         # check if object exists
-#         # if not, raise NoObjectException
-#         assert 0
-#
-#     def test_trace_proper(self):
-#         assert 0
-#
-#     def test_trace_duplicate(self):
-#         # a task queries object and checks "is_task_active"
-#         # if yes, it checks if "task_active_date" is older than 10 minutes
-#         # if no, it is a duplicate -> complete task
-#         # if yes, previous task likely crashed -> take over trace and update "task_active_date"
-#         assert 0
-#
-#     def test_trace_already_done(self):
-#         assert 0
+class SherlockTaskTestCase(TestCase):
+    def test_no_trace(self):
+        # check if object exists
+        # if not, raise NoObjectException
+        assert 0
+
+    def test_trace_proper(self):
+        assert 0
+
+    def test_trace_duplicate(self):
+        # a task queries object and checks "is_task_active"
+        # if yes, it checks if "task_active_date" is older than 10 minutes
+        # if no, it is a duplicate -> complete task
+        # if yes, previous task likely crashed -> take over trace and update "task_active_date"
+        assert 0
+
+    def test_trace_already_done(self):
+        assert 0

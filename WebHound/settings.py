@@ -121,3 +121,5 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 TEMPLATE_DIRS = (os.path.join(BASE_DIR,  'templates'),)
+
+CELERY_BROKER_URL = 'amqp://localhost'

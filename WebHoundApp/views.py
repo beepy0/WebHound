@@ -12,6 +12,7 @@ from .forms import QueryForm
 from .models import Trace
 from .serializers import TraceSerializer
 from .config import msgs
+from .tasks import trace_with_sherlock
 
 
 # Create your views here.
@@ -27,6 +28,7 @@ class HoundTrace(FormView):
         if Trace.objects.filter(name=trace_name).count() == 0:
             Trace(name=trace_name).save()
 
+        trace_with_sherlock.delay(trace_name)
         # TODO os.system(f"python WebHoundApp\\sherlock\\sherlock -o WebHoundApp\\sherlock\\results\\{trace_name}.csv --csv --print-found {trace_name}")
         return super().form_valid(form)
 
