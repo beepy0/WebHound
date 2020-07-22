@@ -1,8 +1,6 @@
-from django.urls import reverse, reverse_lazy
-from django.http import HttpResponseRedirect, Http404
-from django.shortcuts import render, get_object_or_404
+from django.urls import reverse_lazy
 from django.views.generic.edit import FormView, DeleteView
-from django.views.generic.base import View, TemplateView
+from django.views.generic.base import TemplateView
 from django.contrib import messages
 from rest_framework import generics
 from rest_framework.renderers import TemplateHTMLRenderer
@@ -11,7 +9,7 @@ from rest_framework.response import Response
 from .forms import QueryForm
 from .models import Trace
 from .serializers import TraceSerializer
-from .config import msgs, errors
+from .config import msgs
 from .tasks import trace_with_sherlock
 
 
@@ -29,7 +27,6 @@ class HoundTrace(FormView):
             Trace(name=trace_name).save()
 
         trace_with_sherlock.delay(trace_name)
-        # TODO os.system(f"python WebHoundApp\\sherlock\\sherlock -o WebHoundApp\\sherlock\\results\\{trace_name}.csv --csv --print-found {trace_name}")
         return super().form_valid(form)
 
 

@@ -26,6 +26,7 @@ def trace_with_sherlock(name):
                     trace.task_active_ts = datetime.now(tz=pytz.utc)
                     trace.save()
                     ...
+                    # TODO os.system(f"python WebHoundApp\\sherlock\\sherlock -o WebHoundApp\\sherlock\\results\\{trace_name}.csv --csv --print-found {trace_name}")
                     # execute sherlock script
                     # collect data
                     # store data
