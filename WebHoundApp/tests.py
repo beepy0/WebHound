@@ -11,7 +11,7 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from . import views
 from .models import Trace
 from .tasks import trace_with_sherlock
-from .config import errors
+from .config import errors, data
 
 
 class ViewTestMixin(object):
@@ -173,9 +173,13 @@ class SherlockTaskTestCase(TestCase):
         with self.assertRaisesMessage(KeyError, expected_message=errors['no_name_in_db']):
             trace_with_sherlock('no_such_name')
 
-    def test_trace_already_done(self):
+    def test_trace_done(self):
         Trace(name='sample_trace', was_traced=True).save()
         self.assertIs(trace_with_sherlock('sample_trace'), True)
+
+    def test_trace_done_bad_ts(self):
+        Trace(name='sample_trace', was_traced=True, task_active_ts=data['default_task_ts'] - timedelta(hours=1)).save()
+        self.assertRaisesMessage(ValueError, errors['no_task_ts'])
 
     def test_trace_duplicate_slow_or_crashed(self):
         name = 'sample_trace'
