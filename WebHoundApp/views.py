@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from .forms import QueryForm
 from .models import Trace
 from .serializers import TraceSerializer
-from .config import msgs
+from .config import msgs, errors
 from .tasks import trace_with_sherlock
 
 
@@ -45,7 +45,6 @@ class HoundName(generics.GenericAPIView):
         return Response(template_name="WebHoundApp/hound_name.html", data=trace.data)
 
     def delete(self, request, *args, **kwargs):
-        # self.lookup_field = 'name'
         get_object_or_404(self.queryset, pk=kwargs['pk']).delete()
         return HttpResponseRedirect(reverse('WebHoundApp:hound_deleted', kwargs={'pk': kwargs['pk']}))
 
@@ -54,5 +53,5 @@ class HoundDelete(View):
 
     def get(self, request, *args, **kwargs):
         if kwargs == {}:
-            raise Http404('No trace name supplied')
+            raise Http404(errors['no_trace_name'])
         return render(request, 'WebHoundApp/hound_deleted.html', context=kwargs)

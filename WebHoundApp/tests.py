@@ -1,4 +1,5 @@
-"""Generally useful mixins for tests."""
+import pytz
+from datetime import datetime, timedelta
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404
 from django.test import RequestFactory, TestCase
@@ -9,6 +10,8 @@ from django.contrib.sessions.middleware import SessionMiddleware
 
 from . import views
 from .models import Trace
+from .tasks import trace_with_sherlock
+from .config import errors
 
 
 class ViewTestMixin(object):
@@ -161,25 +164,29 @@ class HoundDeleteTestCase(ViewTestMixin, TestCase):
                          template='hound_deleted', route='hound_deleted')
 
     def test_get_no_data(self):
-        with self.assertRaises(Http404, msg='No trace name supplied'):
+        with self.assertRaisesMessage(Http404, expected_message=errors['no_trace_name']):
             self.is_callable(req='get')
 
 
 class SherlockTaskTestCase(TestCase):
     def test_no_trace(self):
-        # check if object exists
-        # if not, raise NoObjectException
-        assert 0
-
-    def test_trace_proper(self):
-        assert 0
-
-    def test_trace_duplicate(self):
-        # a task queries object and checks "is_task_active"
-        # if yes, it checks if "task_active_date" is older than 10 minutes
-        # if no, it is a duplicate -> complete task
-        # if yes, previous task likely crashed -> take over trace and update "task_active_date"
-        assert 0
+        with self.assertRaisesMessage(KeyError, expected_message=errors['no_name_in_db']):
+            trace_with_sherlock('no_such_name')
 
     def test_trace_already_done(self):
-        assert 0
+        Trace(name='sample_trace', was_traced=True).save()
+        self.assertIs(trace_with_sherlock('sample_trace'), True)
+
+    def test_trace_duplicate_slow_or_crashed(self):
+        name = 'sample_trace'
+        ts_reference = datetime.now(tz=pytz.utc)
+        Trace(name=name, was_traced=False, task_active_ts=ts_reference - timedelta(minutes=11)).save()
+        trace_with_sherlock(name)
+        trace = Trace.objects.get(pk=name)
+        self.assertNotEquals(trace.task_active_ts, ts_reference)
+
+    def test_trace_duplicate_active(self):
+        name = 'sample_trace'
+        Trace(name=name, was_traced=False, task_active_ts=datetime.now(tz=pytz.utc)).save()
+        trace_with_sherlock(name)
+        self.assertIs(trace_with_sherlock(name), True)
