@@ -7,8 +7,13 @@
 <body>
     <h1>Trace for: "{{ name }}" | Date initiated: {{ date_friendly }}</h1>
 
-    <p> </p>
+    <form action="{% url 'WebHoundApp:hound_delete' name %}" method="get">
+        {% csrf_token %}
+        <input type="hidden" value="{{ name }}" name="pk">
+        <input type="submit" value="Delete Trace">
+    </form>
 
+    <br>
     <a href="{% url 'WebHoundApp:hound_trace' %}">Back to Homepage</a>
 
     {% if messages %}

@@ -155,8 +155,8 @@ class HoundCallBackTestCase(ViewTestMixin, TestCase):
         self.is_callable(req='get', anno=True, status_code=404, kwargs={'pk': 'dummy_user'})
 
 
-class HoundDeleteTestCase(ViewTestMixin, TestCase):
-    view_class = views.HoundDelete
+class HoundDeletedTestCase(ViewTestMixin, TestCase):
+    view_class = views.HoundDeleted
     app_name = 'WebHoundApp'
 
     def test_get(self):

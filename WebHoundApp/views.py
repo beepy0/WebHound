@@ -1,8 +1,8 @@
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404
-from django.views.generic.edit import FormView
-from django.views.generic.base import View
+from django.views.generic.edit import FormView, DeleteView
+from django.views.generic.base import View, TemplateView
 from django.contrib import messages
 from rest_framework import generics
 from rest_framework.renderers import TemplateHTMLRenderer
@@ -44,14 +44,21 @@ class HoundName(generics.GenericAPIView):
             messages.info(request, msgs['trace_not_done'])
         return Response(template_name="WebHoundApp/hound_name.html", data=trace.data)
 
-    def delete(self, request, *args, **kwargs):
-        get_object_or_404(self.queryset, pk=kwargs['pk']).delete()
-        return HttpResponseRedirect(reverse('WebHoundApp:hound_deleted', kwargs={'pk': kwargs['pk']}))
+
+class HoundDelete(DeleteView):
+    model = Trace
+    template_name = 'WebHoundApp/hound_delete.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(HoundDelete, self).get_context_data(**kwargs)
+        context['pk'] = self.request.GET['pk']
+        return context
+
+    def get_success_url(self):
+        trace_name = self.kwargs['pk']
+        return reverse_lazy('WebHoundApp:hound_deleted', kwargs={'pk': trace_name})
 
 
-class HoundDelete(View):
+class HoundDeleted(TemplateView):
+    template_name = 'WebHoundApp/hound_deleted.html'
 
-    def get(self, request, *args, **kwargs):
-        if kwargs == {}:
-            raise Http404(errors['no_trace_name'])
-        return render(request, 'WebHoundApp/hound_deleted.html', context=kwargs)

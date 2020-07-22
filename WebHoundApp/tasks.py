@@ -29,6 +29,7 @@ def trace_with_sherlock(name):
                     # execute sherlock script
                     # collect data
                     # store data
+                    # delete csv and txt files
                     trace.was_traced = True
                     trace.task_active_ts = data['default_task_ts']
                     trace.save()
