@@ -29,6 +29,7 @@ def trace_with_sherlock(name):
                     # TODO os.system(f"python WebHoundApp\\sherlock\\sherlock -o WebHoundApp\\sherlock\\results\\{trace_name}.csv --csv --print-found {trace_name}")
                     # execute sherlock script
                     # os.path.isfile('/')
+                    #
                     trace.was_traced = True
                     trace.task_active_ts = data['default_task_ts']
                     trace.save()
