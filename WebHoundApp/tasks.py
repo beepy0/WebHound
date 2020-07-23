@@ -1,4 +1,4 @@
-import pytz
+import pytz, os.path
 from datetime import datetime, timedelta
 from celery import shared_task
 from django.core.exceptions import ObjectDoesNotExist
@@ -28,9 +28,7 @@ def trace_with_sherlock(name):
                     ...
                     # TODO os.system(f"python WebHoundApp\\sherlock\\sherlock -o WebHoundApp\\sherlock\\results\\{trace_name}.csv --csv --print-found {trace_name}")
                     # execute sherlock script
-                    # collect data
-                    # store data
-                    # delete csv and txt files
+                    # os.path.isfile('/')
                     trace.was_traced = True
                     trace.task_active_ts = data['default_task_ts']
                     trace.save()

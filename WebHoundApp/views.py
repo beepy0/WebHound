@@ -2,7 +2,7 @@ from django.urls import reverse_lazy
 from django.views.generic.edit import FormView, DeleteView
 from django.views.generic.base import TemplateView
 from django.contrib import messages
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 
@@ -40,6 +40,16 @@ class HoundName(generics.GenericAPIView):
         if trace.data['was_traced'] is False:
             messages.info(request, msgs['trace_not_done'])
         return Response(template_name="WebHoundApp/hound_name.html", data=trace.data)
+
+    def put(self, request, *args, **kwargs):
+        # collect data
+        # store data
+        # delete csv and txt files
+
+        self.object = self.get_object()
+        self.object.data = request.PUT['data']
+        self.object.save()
+        return Response(status=status.HTTP_200_OK)
 
 
 class HoundDelete(DeleteView):
