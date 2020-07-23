@@ -4,7 +4,7 @@ from django.views.generic.edit import FormView, DeleteView
 from django.views.generic.base import TemplateView
 from django.contrib import messages
 from rest_framework import generics, status
-from rest_framework.renderers import TemplateHTMLRenderer
+from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.response import Response
 
 from .forms import QueryForm
@@ -33,14 +33,19 @@ class HoundTrace(FormView):
 
 class HoundName(generics.GenericAPIView):
     queryset = Trace.objects.all()
-    renderer_classes = [TemplateHTMLRenderer]
+    renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        trace = TraceSerializer(self.object)
-        if trace.data['was_traced'] is False:
+        context = TraceSerializer(self.object).data
+        if context['was_traced'] is False:
             messages.info(request, msgs['trace_not_done'])
-        return Response(template_name="WebHoundApp/hound_name.html", data=trace.data)
+        else:
+            try:
+                context['results'] = [result for result in context['data'].split(" ; ")][:-2]
+            except Exception:
+                raise ValueError('was_traced is true but no trace results')
+        return Response(template_name="WebHoundApp/hound_name.html", data=context)
 
     def put(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -52,9 +57,9 @@ class HoundName(generics.GenericAPIView):
             self.object.save()
 
             os.remove(cfg_data['sherlock_results_dir'].format(self.object.name))
-            return Response(status=status.HTTP_200_OK)
+            return Response({}, status=status.HTTP_200_OK)
         else:
-            return Response(status=status.HTTP_417_EXPECTATION_FAILED)
+            return Response({}, status=status.HTTP_417_EXPECTATION_FAILED)
 
 
 class HoundDelete(DeleteView):

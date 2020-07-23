@@ -29,12 +29,13 @@ def trace_with_sherlock(name):
                     cmd = cfg_data['sherlock_win_cmd'] if platform.system() == 'Windows' \
                         else cfg_data['sherlock_unix_cmd']
                     # execute sherlock script
-                    os.system(f"{cmd}")
+                    os.system(cmd.format(trace.name, trace.name))
                     if os.path.isfile(cfg_data['sherlock_results_dir'].format(trace.name)) is True:
                         trace.was_traced = True
                         trace.task_active_ts = cfg_data['default_task_ts']
                         trace.save()
-                        requests.put(reverse('WebHoundApp:hound_name', kwargs={'pk': trace.name}))
+                        requests.put(cfg_data['root_url'].format(
+                            reverse('WebHoundApp:hound_name', kwargs={'pk': trace.name})))
                     return True
                 else:  # a task was started but has slowed/crashed
                     trace.task_active_ts = cfg_data['default_task_ts']

@@ -22,6 +22,12 @@
             <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
         {% endfor %}
     </ul>
+    {% else %}
+        <ul>
+            {% for result in results %}
+                <li><a href="{{ result }}" target="_blank">{{ result }}</a> </li>
+            {% endfor %}
+        </ul>
     {% endif %}
 
 </body>

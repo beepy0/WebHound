@@ -129,10 +129,20 @@ class HoundCallBackTestCase(ViewTestMixin, TestCase):
     view_class = views.HoundName
     app_name = 'WebHoundApp'
 
-    def test_get(self):
+    def test_get_traced(self):
+        name = 'user123'
         self.is_callable(req='get', anno=True, status_code=404, kwargs={'pk': 'no_such_user'})
-        Trace(name='dummy_user').save()
-        self.is_callable(req='get', anno=True, kwargs={'pk': 'dummy_user'}, template='hound_name', route='hound_name')
+
+        Trace(name=name, was_traced=True, data="url1 ; url2 ; url3 ; misc ; ").save()
+        copyfile('WebHoundApp/test_data/user123.csv', cfg_data['sherlock_results_dir'].format(name))
+
+        self.is_callable(req='get', anno=True, kwargs={'pk': name}, template='hound_name', route='hound_name')
+
+        resp = self.get_response(method='get', anno=True, user=None, data={}, args=[], kwargs={'pk': name})
+        self.assertEqual(resp.data['results'], ['url1', 'url2', 'url3'])
+
+    def test_get_not_traced(self):
+        self.assertFalse(1)
 
     def test_post(self):
         Trace(name='dummy_user').save()
@@ -145,9 +155,9 @@ class HoundCallBackTestCase(ViewTestMixin, TestCase):
         self.is_callable(req='put', status_code=417, kwargs={'pk': 'dummy_user'})
 
     def test_put_proper(self):
-        name = 'meggamorty'
+        name = 'user123'
         Trace(name=name, was_traced=True).save()
-        copyfile('WebHoundApp/test_data/meggamorty.csv', cfg_data['sherlock_results_dir'].format(name))
+        copyfile('WebHoundApp/test_data/user123.csv', cfg_data['sherlock_results_dir'].format(name))
         self.is_callable(req='put', status_code=200, kwargs={'pk': name})
         trace = Trace.objects.get(name=name)
         self.assertEqual(trace.data, cfg_test['put_data'])
@@ -170,10 +180,6 @@ class HoundDeletedTestCase(ViewTestMixin, TestCase):
     def test_get(self):
         self.is_callable(req='get', kwargs={'pk': 'deleted_dummy_user'},
                          template='hound_deleted', route='hound_deleted')
-
-    # def test_get_no_pk(self):
-    #     # with self.assertRaisesMessage(Http404, expected_message=errors['no_trace_name']):
-    #     self.is_callable(req='get')
 
 
 class SherlockTaskTestCase(TestCase):
