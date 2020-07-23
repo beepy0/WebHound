@@ -15,8 +15,8 @@ cfg_data = {
     'root_url': 'http://127.0.0.1:8000{}?format=json',
     'default_task_ts': datetime.strptime('01.01.1990+0000', '%d.%m.%Y%z'),
     'sherlock_results_dir': "WebHoundApp/sherlock/results/{}.csv",
-    'sherlock_unix_cmd': "python WebHoundApp/sherlock/sherlock -o WebHoundApp/sherlock/results/{}.csv --csv --timeout 15 --print-found {}",
-    'sherlock_win_cmd': "python WebHoundApp\\sherlock\\sherlock -o WebHoundApp\\sherlock\\results\\{}.csv --csv --timeout 15 --print-found {}",
+    'sherlock_unix_cmd': "python WebHoundApp/sherlock/sherlock -o WebHoundApp/sherlock/results/{}.csv --timeout 15 --print-found {}",
+    'sherlock_win_cmd': "python WebHoundApp\\sherlock\\sherlock -o WebHoundApp\\sherlock\\results\\{}.csv --timeout 15 --print-found {}",
 }
 
 cfg_test = {
