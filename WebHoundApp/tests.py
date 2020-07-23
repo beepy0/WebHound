@@ -91,11 +91,6 @@ class ViewTestMixin(object):
             url = resp.url if to else reverse(f"{self.app_name}:{route}", kwargs=kwargs)
             self.is_viewable(url, template)
 
-    def is_not_callable(self, **kwargs):
-        """Tests if call raises a 404."""
-        with self.assertRaises(Http404):
-            self.is_callable(**kwargs)
-
     def is_viewable(
         self,
         url,
@@ -145,10 +140,8 @@ class HoundCallBackTestCase(ViewTestMixin, TestCase):
 
     # TODO test retry trace here
     def test_put_error(self):
+        self.is_callable(req='put', status_code=404, kwargs={'pk': 'dummy_user'})
         Trace(name='dummy_user').save()
-        # make a test csv file
-        # call put on user with empty data
-        # verify user has data added
         self.is_callable(req='put', status_code=417, kwargs={'pk': 'dummy_user'})
 
     def test_put_proper(self):
@@ -179,8 +172,8 @@ class HoundDeletedTestCase(ViewTestMixin, TestCase):
                          template='hound_deleted', route='hound_deleted')
 
     # def test_get_no_pk(self):
-    #     with self.assertRaisesMessage(Http404, expected_message=errors['no_trace_name']):
-    #         self.is_callable(req='get')
+    #     # with self.assertRaisesMessage(Http404, expected_message=errors['no_trace_name']):
+    #     self.is_callable(req='get')
 
 
 class SherlockTaskTestCase(TestCase):
@@ -193,7 +186,8 @@ class SherlockTaskTestCase(TestCase):
         self.assertIs(trace_with_sherlock('sample_trace'), True)
 
     def test_trace_done_bad_ts(self):
-        Trace(name='sample_trace', was_traced=True, task_active_ts=cfg_data['default_task_ts'] - timedelta(hours=1)).save()
+        Trace(name='sample_trace', was_traced=True,
+              task_active_ts=cfg_data['default_task_ts'] - timedelta(hours=1)).save()
         self.assertRaisesMessage(ValueError, errors['no_task_ts'])
 
     def test_trace_duplicate_slow_or_crashed(self):
