@@ -1,3 +1,4 @@
+import csv, os
 from django.urls import reverse_lazy
 from django.views.generic.edit import FormView, DeleteView
 from django.views.generic.base import TemplateView
@@ -9,7 +10,7 @@ from rest_framework.response import Response
 from .forms import QueryForm
 from .models import Trace
 from .serializers import TraceSerializer
-from .config import msgs
+from .config import msgs, cfg_data
 from .tasks import trace_with_sherlock
 
 
@@ -42,14 +43,18 @@ class HoundName(generics.GenericAPIView):
         return Response(template_name="WebHoundApp/hound_name.html", data=trace.data)
 
     def put(self, request, *args, **kwargs):
-        # collect data
-        # store data
-        # delete csv and txt files
-
         self.object = self.get_object()
-        self.object.data = request.PUT['data']
-        self.object.save()
-        return Response(status=status.HTTP_200_OK)
+        if self.object.was_traced is True:
+            with open(cfg_data['sherlock_results_dir'].format(self.object.name), newline='') as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=',')
+                for row in csv_reader:
+                    self.object.data += f"{str(row[0])} ; "
+            self.object.save()
+
+            os.remove(cfg_data['sherlock_results_dir'].format(self.object.name))
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_417_EXPECTATION_FAILED)
 
 
 class HoundDelete(DeleteView):

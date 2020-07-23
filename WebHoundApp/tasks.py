@@ -1,17 +1,18 @@
-import pytz, os.path
+import requests, pytz, os.path, os, platform
 from datetime import datetime, timedelta
 from celery import shared_task
 from django.core.exceptions import ObjectDoesNotExist
+from django.urls import reverse
 
 from .models import Trace
-from .config import errors, data
+from .config import errors, cfg_data
 
 
 @shared_task
 def trace_with_sherlock(name):
     try:
         trace = Trace.objects.get(pk=name)
-        assert trace.task_active_ts >= data['default_task_ts']
+        assert trace.task_active_ts >= cfg_data['default_task_ts']
     except ObjectDoesNotExist:
         raise KeyError(errors['no_name_in_db'])
     except Exception:
@@ -22,20 +23,21 @@ def trace_with_sherlock(name):
         else:
             # tasks that have ran more than 10 minutes without finishing need to be restarted
             if datetime.now(trace.task_active_ts.tzinfo) > trace.task_active_ts + timedelta(minutes=10):
-                if trace.task_active_ts == data['default_task_ts']:  # no task started for this name yet
+                if trace.task_active_ts == cfg_data['default_task_ts']:  # no task started for this name yet
                     trace.task_active_ts = datetime.now(tz=pytz.utc)
                     trace.save()
-                    ...
-                    # TODO os.system(f"python WebHoundApp\\sherlock\\sherlock -o WebHoundApp\\sherlock\\results\\{trace_name}.csv --csv --print-found {trace_name}")
+                    cmd = cfg_data['sherlock_win_cmd'] if platform.system() == 'Windows' \
+                        else cfg_data['sherlock_unix_cmd']
                     # execute sherlock script
-                    # os.path.isfile('/')
-                    #
-                    trace.was_traced = True
-                    trace.task_active_ts = data['default_task_ts']
-                    trace.save()
+                    os.system(f"{cmd}")
+                    if os.path.isfile(cfg_data['sherlock_results_dir'].format(trace.name)) is True:
+                        trace.was_traced = True
+                        trace.task_active_ts = cfg_data['default_task_ts']
+                        trace.save()
+                        requests.put(reverse('WebHoundApp:hound_name', kwargs={'pk': trace.name}))
                     return True
                 else:  # a task was started but has slowed/crashed
-                    trace.task_active_ts = data['default_task_ts']
+                    trace.task_active_ts = cfg_data['default_task_ts']
                     trace.save()
                     trace_with_sherlock.delay(name)
                     return False

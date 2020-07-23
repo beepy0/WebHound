@@ -1,4 +1,5 @@
-import pytz
+import pytz, os.path
+from shutil import copyfile
 from datetime import datetime, timedelta
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404
@@ -11,7 +12,7 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from . import views
 from .models import Trace
 from .tasks import trace_with_sherlock
-from .config import errors, data
+from .config import errors, cfg_data, cfg_test
 
 
 class ViewTestMixin(object):
@@ -143,16 +144,30 @@ class HoundCallBackTestCase(ViewTestMixin, TestCase):
         self.is_callable(req='post', status_code=405, kwargs={'pk': 'dummy_user'})
 
     # TODO test retry trace here
-    def test_put(self):
+    def test_put_error(self):
         Trace(name='dummy_user').save()
-        self.is_callable(req='put', status_code=405, kwargs={'pk': 'dummy_user'})
+        # make a test csv file
+        # call put on user with empty data
+        # verify user has data added
+        self.is_callable(req='put', status_code=417, kwargs={'pk': 'dummy_user'})
 
-    def test_delete(self):
-        Trace(name='dummy_user').save()
-        self.is_callable(req='get', anno=True, kwargs={'pk': 'dummy_user'}, template='hound_name', route='hound_name')
-        self.is_callable(req='delete', kwargs={'pk': 'dummy_user'},
-                         to='hound_deleted', template='hound_deleted', route='hound_deleted')
-        self.is_callable(req='get', anno=True, status_code=404, kwargs={'pk': 'dummy_user'})
+    def test_put_proper(self):
+        name = 'meggamorty'
+        Trace(name=name, was_traced=True).save()
+        copyfile('WebHoundApp/test_data/meggamorty.csv', cfg_data['sherlock_results_dir'].format(name))
+        self.is_callable(req='put', status_code=200, kwargs={'pk': name})
+        trace = Trace.objects.get(name=name)
+        self.assertEqual(trace.data, cfg_test['put_data'])
+        self.assertIs(os.path.isfile(cfg_data['sherlock_results_dir'].format(name)), False)
+
+
+# TODO tests for HoundDelete view
+    # def test_delete(self):
+    #     Trace(name='dummy_user').save()
+    #     self.is_callable(req='get', anno=True, kwargs={'pk': 'dummy_user'}, template='hound_name', route='hound_name')
+    #     self.is_callable(req='delete', kwargs={'pk': 'dummy_user'},
+    #                      to='hound_deleted', template='hound_deleted', route='hound_deleted')
+    #     self.is_callable(req='get', anno=True, status_code=404, kwargs={'pk': 'dummy_user'})
 
 
 class HoundDeletedTestCase(ViewTestMixin, TestCase):
@@ -163,9 +178,9 @@ class HoundDeletedTestCase(ViewTestMixin, TestCase):
         self.is_callable(req='get', kwargs={'pk': 'deleted_dummy_user'},
                          template='hound_deleted', route='hound_deleted')
 
-    def test_get_no_data(self):
-        with self.assertRaisesMessage(Http404, expected_message=errors['no_trace_name']):
-            self.is_callable(req='get')
+    # def test_get_no_pk(self):
+    #     with self.assertRaisesMessage(Http404, expected_message=errors['no_trace_name']):
+    #         self.is_callable(req='get')
 
 
 class SherlockTaskTestCase(TestCase):
@@ -178,7 +193,7 @@ class SherlockTaskTestCase(TestCase):
         self.assertIs(trace_with_sherlock('sample_trace'), True)
 
     def test_trace_done_bad_ts(self):
-        Trace(name='sample_trace', was_traced=True, task_active_ts=data['default_task_ts'] - timedelta(hours=1)).save()
+        Trace(name='sample_trace', was_traced=True, task_active_ts=cfg_data['default_task_ts'] - timedelta(hours=1)).save()
         self.assertRaisesMessage(ValueError, errors['no_task_ts'])
 
     def test_trace_duplicate_slow_or_crashed(self):
