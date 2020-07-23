@@ -25,7 +25,7 @@ SECRET_KEY = '5&ajs_4z83zeq#tmoo@73(qhy!#3-+&e*a)3mdvzb943(u@_kh'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'shielded-badlands-63643.herokuapp.com/']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'shielded-badlands-63643.herokuapp.com']
 
 
 # Application definition
