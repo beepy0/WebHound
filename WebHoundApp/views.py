@@ -59,11 +59,10 @@ class HoundName(generics.GenericAPIView):
 
 class HoundDelete(DeleteView):
     model = Trace
-    template_name = 'WebHoundApp/hound_delete.html'
 
     def get_context_data(self, **kwargs):
         context = super(HoundDelete, self).get_context_data(**kwargs)
-        context['pk'] = self.request.GET['pk']
+        context['pk'] = self.request.GET.get('pk', 'no-pk')
         return context
 
     def get_success_url(self):

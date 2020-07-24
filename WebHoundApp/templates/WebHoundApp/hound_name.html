@@ -1,17 +1,24 @@
+{% load static %}
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hound Name</title>
+
+    <link href="{% static 'WebHoundApp/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" media="screen">
+    <link href="{% static 'WebHoundApp/css/font-awesome.min.css' %}" rel="stylesheet" media="screen">
+	<link href="{% static 'WebHoundApp/css/animate.css' %}" rel="stylesheet' %}">
+
 </head>
 <body>
     <h1>Trace for: "{{ name }}" | Date initiated: {{ date_friendly }}</h1>
 
-    <form action="{% url 'WebHoundApp:hound_delete' name %}" method="get">
-        {% csrf_token %}
-        <input type="hidden" value="{{ name }}" name="pk">
-        <input type="submit" value="Delete Trace">
-    </form>
+    <!-- Button trigger delete trace modal -->
+    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal">
+      Delete Trace
+    </button>
 
     <br>
     <a href="{% url 'WebHoundApp:hound_trace' %}">Back to Homepage</a>
@@ -38,6 +45,49 @@
             {% endfor %}
         </ul>
     {% endif %}
+
+
+
+
+    <!-- Delete Trace Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <!--Content-->
+        <div class="modal-content text-center">
+          <!--Header-->
+          <div class="modal-header d-flex justify-content-center">
+            <h4 class="modal-title w-100 font-weight-bold">Delete Trace</h4>
+          </div>
+
+          <!--Body-->
+          <div class="modal-body mx-5">
+              Are you sure?
+          </div>
+
+          <!--Footer + Form-->
+          <div class="modal-footer">
+              <form action="{% url 'WebHoundApp:hound_delete' name %}" method="post" role="form">
+                  {% csrf_token %}
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="submit" class="position btn btn-danger">Delete</button>
+              </form>
+          </div>
+        </div>
+        <!--/.Content-->
+      </div>
+    </div>
+
+    <script src="{% static 'WebHoundApp/js/jquery-1.11.1.min.js' %}"></script>
+	<script src="{% static 'WebHoundApp/bootstrap/js/bootstrap.min.js' %}"></script>
+	<script src="{% static 'WebHoundApp/js/jquery.parallax-1.1.3.js' %}"></script>
+	<script src="{% static 'WebHoundApp/js/imagesloaded.pkgd.js' %}"></script>
+	<script src="{% static 'WebHoundApp/js/jquery.sticky.js' %}"></script>
+	<script src="{% static 'WebHoundApp/js/smoothscroll.js' %}"></script>
+	<script src="{% static 'WebHoundApp/js/wow.min.js' %}"></script>
+    <script src="{% static 'WebHoundApp/js/waypoints.min.js' %}"></script>
+    <script src="{% static 'WebHoundApp/js/jquery.cbpQTRotator.js' %}"></script>
+	<script src="{% static 'WebHoundApp/js/custom.js' %}"></script>
 
 </body>
 </html>
