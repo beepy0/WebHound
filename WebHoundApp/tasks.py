@@ -11,7 +11,8 @@ from .config import errors, cfg_data
 @shared_task
 def trace_with_sherlock(name):
     try:
-        trace = Trace.objects.get(pk=name)
+        print(f'received name in task: {name}')
+        trace = Trace.objects.get(name=name)
         assert trace.task_active_ts >= cfg_data['default_task_ts']
     except ObjectDoesNotExist:
         raise KeyError(errors['no_name_in_db'])
