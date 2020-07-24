@@ -1,3 +1,3 @@
 release: python manage.py migrate
 web: gunicorn WebHound.wsgi
-worker: celery -A WebHoundApp worker -l info
+worker: celery worker --app=tasks.app
