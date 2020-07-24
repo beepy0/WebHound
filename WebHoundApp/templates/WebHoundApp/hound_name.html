@@ -22,6 +22,15 @@
             <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
         {% endfor %}
     </ul>
+
+    <script>
+    function reload(){
+       window.location.href = "{% url 'WebHoundApp:hound_name' name %}";
+    }
+
+    setTimeout(reload, 10000);
+    </script>
+
     {% else %}
         <ul>
             {% for result in results %}

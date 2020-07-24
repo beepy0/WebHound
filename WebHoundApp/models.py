@@ -12,3 +12,8 @@ class Trace(models.Model):
 
     def __str__(self):
         return f"{self.date} | {self.was_traced} | {self.name} | {len(self.data)}"
+
+
+class Counter(models.Model):
+    id = models.CharField(max_length=200, primary_key=True)
+    count = models.IntegerField(default=0)

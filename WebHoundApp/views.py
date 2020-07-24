@@ -1,14 +1,14 @@
-import csv, os
 from django.urls import reverse_lazy
 from django.views.generic.edit import FormView, DeleteView
 from django.views.generic.base import TemplateView
 from django.contrib import messages
+from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.response import Response
 
 from .forms import QueryForm
-from .models import Trace
+from .models import Trace, Counter
 from .serializers import TraceSerializer
 from .config import msgs, cfg_data
 from .tasks import trace_with_sherlock
@@ -29,6 +29,11 @@ class HoundTrace(FormView):
 
         trace_with_sherlock.delay(trace_name)
         return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super(HoundTrace, self).get_context_data(**kwargs)
+        context['traces_cnt'] = get_object_or_404(Counter, id='traces_all').count
+        return context
 
 
 class HoundName(generics.GenericAPIView):

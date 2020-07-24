@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from celery import shared_task
 from django.core.exceptions import ObjectDoesNotExist
 
-from .models import Trace
+from .models import Trace, Counter
 from .config import errors, cfg_data
 
 
@@ -36,8 +36,12 @@ def trace_with_sherlock(name):
                         with open(cfg_data['sherlock_results_dir'].format(trace.name), newline='') as csv_file:
                             csv_reader = csv.reader(csv_file, delimiter=',')
                             for row in csv_reader:
-                                trace.data += f"{str(row[0])} ; "
+                                trace.data += f"{str(row[0])} ; "  # TODO store directly as list instead
                         trace.save()
+
+                        traces_counter = Counter.objects.get(id='traces_all')
+                        traces_counter.count += 1
+                        traces_counter.save()
 
                         os.remove(cfg_data['sherlock_results_dir'].format(trace.name))
                     return True
