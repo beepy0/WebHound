@@ -24,7 +24,9 @@ class HoundTrace(FormView):
         trace_name = form.cleaned_data['query']
         self.success_url = f"/webhound/name/{trace_name}/"
 
+        print(f"receiving trace {trace_name}")
         if Trace.objects.filter(name=trace_name).count() == 0:
+            print(f"saving trace {trace_name}")
             Trace(name=trace_name).save()
 
         trace_with_sherlock.delay(trace_name)
