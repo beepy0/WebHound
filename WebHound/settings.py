@@ -129,3 +129,14 @@ STATICFILES_DIRS = (
 TEMPLATE_DIRS = (os.path.join(BASE_DIR,  'templates'),)
 
 CELERY_BROKER_URL = 'amqp://localhost'
+
+
+# setup heroku celery
+
+BROKER_URL = os.environ.get("CLOUDAMQP_URL", "amqp://localhost")
+BROKER_POOL_LIMIT = 1
+BROKER_CONNECTION_MAX_RETRIES = None
+
+CELERY_TASK_SERIALIZER = "json"
+CELERY_ACCEPT_CONTENT = ["json", "msgpack"]
+CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
