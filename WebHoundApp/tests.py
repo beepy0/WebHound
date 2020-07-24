@@ -149,19 +149,8 @@ class HoundCallBackTestCase(ViewTestMixin, TestCase):
         self.is_callable(req='post', status_code=405, kwargs={'pk': 'dummy_user'})
 
     # TODO test retry trace here
-    def test_put_error(self):
-        self.is_callable(req='put', status_code=404, kwargs={'pk': 'dummy_user'})
-        Trace(name='dummy_user').save()
-        self.is_callable(req='put', status_code=417, kwargs={'pk': 'dummy_user'})
-
-    def test_put_proper(self):
-        name = 'user123'
-        Trace(name=name, was_traced=True).save()
-        copyfile('WebHoundApp/test_data/user123.csv', cfg_data['sherlock_results_dir'].format(name))
-        self.is_callable(req='put', status_code=200, kwargs={'pk': name})
-        trace = Trace.objects.get(name=name)
-        self.assertEqual(trace.data, cfg_test['put_data'])
-        self.assertIs(os.path.isfile(cfg_data['sherlock_results_dir'].format(name)), False)
+    def test_put(self):
+        ...
 
 
 # TODO tests for HoundDelete view

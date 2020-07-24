@@ -1,8 +1,7 @@
-import requests, pytz, os.path, os, platform
+import csv, pytz, os.path, os, platform
 from datetime import datetime, timedelta
 from celery import shared_task
 from django.core.exceptions import ObjectDoesNotExist
-from django.urls import reverse
 
 from .models import Trace
 from .config import errors, cfg_data
@@ -11,7 +10,6 @@ from .config import errors, cfg_data
 @shared_task
 def trace_with_sherlock(name):
     try:
-        print(f'received name in task: {name}')
         trace = Trace.objects.get(name=name)
         assert trace.task_active_ts >= cfg_data['default_task_ts']
     except ObjectDoesNotExist:
@@ -31,12 +29,17 @@ def trace_with_sherlock(name):
                         else cfg_data['sherlock_unix_cmd']
                     # execute sherlock script
                     os.system(cmd.format(trace.name, trace.name))
+                    # save results to DB
                     if os.path.isfile(cfg_data['sherlock_results_dir'].format(trace.name)) is True:
                         trace.was_traced = True
                         trace.task_active_ts = cfg_data['default_task_ts']
+                        with open(cfg_data['sherlock_results_dir'].format(trace.name), newline='') as csv_file:
+                            csv_reader = csv.reader(csv_file, delimiter=',')
+                            for row in csv_reader:
+                                trace.data += f"{str(row[0])} ; "
                         trace.save()
-                        requests.put(cfg_data['root_url'].format(
-                            reverse('WebHoundApp:hound_name', kwargs={'pk': trace.name})))
+
+                        os.remove(cfg_data['sherlock_results_dir'].format(trace.name))
                     return True
                 else:  # a task was started but has slowed/crashed
                     trace.task_active_ts = cfg_data['default_task_ts']
