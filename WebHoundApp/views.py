@@ -1,6 +1,5 @@
 from django.urls import reverse_lazy
 from django.views.generic.edit import FormView, DeleteView
-from django.views.generic.base import TemplateView
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
@@ -47,7 +46,7 @@ class HoundName(generics.GenericAPIView):
             messages.info(request, msgs['trace_not_done'])
         else:
             try:
-                context['results'] = [result for result in context['data'].split(" ; ")][:-2]
+                context['results'] = context['data'][:-2]
             except Exception:
                 raise ValueError('was_traced is true but no trace results')
         return Response(template_name="WebHoundApp/hound_name.html", data=context)

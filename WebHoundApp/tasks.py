@@ -1,4 +1,8 @@
-import csv, pytz, os.path, os, platform
+import csv
+import pytz
+import os.path
+import os
+import platform
 from datetime import datetime, timedelta
 from celery import shared_task
 from django.core.exceptions import ObjectDoesNotExist

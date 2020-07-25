@@ -1,8 +1,7 @@
-import pytz, os.path
+import pytz
 from shutil import copyfile
 from datetime import datetime, timedelta
 from django.contrib.auth.models import AnonymousUser
-from django.http import Http404
 from django.test import RequestFactory, TestCase
 from django.urls import resolve, reverse
 from django.urls.exceptions import Resolver404
@@ -12,7 +11,7 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from . import views
 from .models import Trace, Counter
 from .tasks import trace_with_sherlock
-from .config import errors, cfg_data, cfg_test
+from .config import errors, cfg_data
 
 
 class ViewTestMixin(object):
