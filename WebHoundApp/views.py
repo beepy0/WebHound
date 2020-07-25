@@ -3,14 +3,14 @@ from django.views.generic.edit import FormView, DeleteView
 from django.views.generic.base import TemplateView
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
-from rest_framework import generics, status
+from rest_framework import generics
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.response import Response
 
 from .forms import QueryForm
 from .models import Trace, Counter
 from .serializers import TraceSerializer
-from .config import msgs, cfg_data
+from .config import msgs
 from .tasks import trace_with_sherlock
 
 
@@ -60,16 +60,5 @@ class HoundName(generics.GenericAPIView):
 class HoundDelete(DeleteView):
     model = Trace
 
-    def get_context_data(self, **kwargs):
-        context = super(HoundDelete, self).get_context_data(**kwargs)
-        context['pk'] = self.request.GET.get('pk', 'no-pk')
-        return context
-
     def get_success_url(self):
-        trace_name = self.kwargs['pk']
-        return reverse_lazy('WebHoundApp:hound_deleted', kwargs={'pk': trace_name})
-
-
-class HoundDeleted(TemplateView):
-    template_name = 'WebHoundApp/hound_deleted.html'
-
+        return reverse_lazy('WebHoundApp:hound_trace')

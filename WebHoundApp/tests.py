@@ -10,7 +10,7 @@ from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 
 from . import views
-from .models import Trace
+from .models import Trace, Counter
 from .tasks import trace_with_sherlock
 from .config import errors, cfg_data, cfg_test
 
@@ -104,6 +104,9 @@ class HoundTraceTestCase(ViewTestMixin, TestCase):
     view_class = views.HoundTrace
     app_name = 'WebHoundApp'
 
+    def setUp(self):
+        Counter(id='traces_all').save()
+
     def test_get(self):
         self.is_callable()
 
@@ -160,15 +163,6 @@ class HoundCallBackTestCase(ViewTestMixin, TestCase):
     #     self.is_callable(req='delete', kwargs={'pk': 'dummy_user'},
     #                      to='hound_deleted', template='hound_deleted', route='hound_deleted')
     #     self.is_callable(req='get', anno=True, status_code=404, kwargs={'pk': 'dummy_user'})
-
-
-class HoundDeletedTestCase(ViewTestMixin, TestCase):
-    view_class = views.HoundDeleted
-    app_name = 'WebHoundApp'
-
-    def test_get(self):
-        self.is_callable(req='get', kwargs={'pk': 'deleted_dummy_user'},
-                         template='hound_deleted', route='hound_deleted')
 
 
 class SherlockTaskTestCase(TestCase):
