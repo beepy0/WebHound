@@ -43,7 +43,7 @@ def trace_with_sherlock(name):
                                 trace.data += f"{str(row[0])} ; "  # TODO store directly as list instead
                         trace.save()
 
-                        traces_counter = Counter.objects.get(id='traces_all')
+                        traces_counter = Counter.objects.get(id='traces')
                         traces_counter.count += 1
                         traces_counter.save()
 

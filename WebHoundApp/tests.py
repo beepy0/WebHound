@@ -104,7 +104,7 @@ class HoundTraceTestCase(ViewTestMixin, TestCase):
     app_name = 'WebHoundApp'
 
     def setUp(self):
-        Counter(id='traces_all').save()
+        Counter(id='traces').save()
 
     def test_get(self):
         self.is_callable()

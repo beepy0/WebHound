@@ -31,7 +31,7 @@ class HoundTrace(FormView):
 
     def get_context_data(self, **kwargs):
         context = super(HoundTrace, self).get_context_data(**kwargs)
-        context['traces_cnt'] = get_object_or_404(Counter, id='traces_all').count
+        context['traces_cnt'] = get_object_or_404(Counter, id='traces').count
         return context
 
 
