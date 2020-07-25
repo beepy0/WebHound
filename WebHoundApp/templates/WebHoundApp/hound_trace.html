@@ -10,29 +10,36 @@
     <link href="{% static 'WebHoundApp/css/style.css' %}" rel="stylesheet" media="screen">
 </head>
 <body>
-    <div class="main-div centered-div">
-        <div class="hor-cent">
-            <h3 class="title-style hacker-cyan centered-msg">WebHound</h3>
-            <a href="{% url 'WebHoundApp:hound_trace' %}">
-                <img id="webhlogo" src="{% static 'WebHoundApp/images/logo_resized.png' %}" width=300>
-            </a>
-        </div>
-        <div class="hor-cent centered-msg">
-            <div class="hacker-cyan">
-                <a>Unleash your inner hacker and trace any username across the web!</a>
+    <div class="main-div">
+        <div class="head-div hor-cent">
+            <div class="title-div">
+                <h3 class="hacker-cyan text-cent">WebHound</h3>
             </div>
-            <form method="post">
-                {% csrf_token %}
-                {{ form.as_p }}
-            </form>
+            <div class="logo-div">
+                <a href="{% url 'WebHoundApp:hound_trace' %}">
+                    <img id="webhlogo" src="{% static 'WebHoundApp/images/logo_resized.png' %}" width=300>
+                </a>
+            </div>
         </div>
 
-        <div class="hor-cent footer-info">
-            <div class="footer-txt">
-                <p class="text-cent hacker-cyan"> Hounds made {{ traces_cnt }} successful traces so far </p>
+        <div class="body-div hor-cent">
+            <div class="intro-div hacker-cyan">
+                Unleash your inner hacker and trace any username across the web!
             </div>
-            <div class="footer-sherlock">
-                <a class="hor-cent" href="https://github.com/sherlock-project/sherlock" target="_blank">
+            <div class="query-div">
+                <form class="centered-div" method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                </form>
+            </div>
+        </div>
+
+        <div class="footer-div hor-cent">
+            <div class="counter-div hacker-cyan">
+                Hounds made {{ traces_cnt }} successful traces so far
+            </div>
+            <div class="sherlock-div">
+                <a class="sherlock-logo centered-div" href="https://github.com/sherlock-project/sherlock" target="_blank">
                     <img id="poweredby" src="{% static 'WebHoundApp/images/powered_by.jpg' %}" alt="Powered by Sherlock" width=150>
                 </a>
             </div>

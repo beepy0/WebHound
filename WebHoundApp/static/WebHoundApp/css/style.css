@@ -1,19 +1,91 @@
+html{
+  height: 100vh;
+}
+
 body {
 	background-color:#2f292b;
 	overflow-x: hidden;
+	min-height: 98vh;
 }
 
-.title-style {
-	margin: 18px 0 0 0 !important;
+.main-div {
+	height: 90%;
+	width: 75%;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.head-div {
+	height: 360px;
+	width: 300px;
+	padding: 0 0 10px 0;
+	position: relative;
+}
+
+.title-div {
+	margin: 10px 0 0 0 !important;
+	height: 50px;
+	width: 300px;
+	position: relative;
+}
+
+.logo-div {
+	height: 300px;
+	width: 300px;
+	position: relative;
+}
+
+.body-div {
+	height: 100px;
+	width: 560px;
+	position: relative;
+}
+
+.intro-div {
+	height: 30px;
+	padding: 10px 0 0 0;
+	position: relative;
+	text-align: center;
+}
+
+.query-div {
+	height: 40px;
+	padding: 10px 0 10px 0;
+	position: relative;
+}
+
+.footer-div {
+	height: 222px;
+	width: 400px;
+	padding: 10px 0 0 0;
+	position: relative;
+	bottom: 0;
+}
+
+.counter-div {
+	height: 30px;
+	width: 400px;
+	padding: 10px 0 10px 0;
+	position: relative;
+	text-align: center;
+}
+
+.sherlock-div {
+	height: 162px;
+	width: 400px;
+	padding: 10px 0 0 0;
+	position: relative;
+}
+
+.sherlock-logo {
+	height: 142px;
+	width: 150px;
 }
 
 .hacker-cyan {
 	color: #28b0b7 !important;
-}
-
-.main-div {
-	height: 95%;
-	width: 50%;
 }
 
 .centered-div {
@@ -24,7 +96,7 @@ body {
 }
 
 .centered-msg {
-	position: relative;
+	position: absolute;
 	text-align: center;
 	top: 50%;
 	left: 50%;
@@ -37,27 +109,13 @@ body {
 }
 
 .hor-cent {
-	position: absolute;
 	left: 50%;
-	padding: 5px 0 5px 0;
+	/*padding: 5px 0 5px 0;*/
 	transform: translate(-50%, 0%);
-}
-
-.footer-info {
-	height: 222px;
-	width: 400px;
-	position: absolute;
-	bottom: 0;
 }
 
 .footer-txt {
 	padding: 5px
-}
-
-.footer-sherlock {
-	padding: 10px 10px 0 10px;
-	height: 150px;
-	position: relative;
 }
 
 /*body {*/
