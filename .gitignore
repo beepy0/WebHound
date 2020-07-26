@@ -33,3 +33,5 @@ env.bak/
 venv.bak/
 
 staticfiles
+
+.coverage
