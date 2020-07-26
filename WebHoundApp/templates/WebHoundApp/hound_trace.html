@@ -12,10 +12,10 @@
 <body>
     <div class="main-div">
         <div class="head-div hor-cent">
-            <div class="title-div">
-                <h3 class="hacker-cyan text-cent">WebHound</h3>
+            <div class="title-div title-text hacker-cyan text-cent hor-cent">
+                WebHound
             </div>
-            <div class="logo-div">
+            <div class="logo-div hor-cent">
                 <a href="{% url 'WebHoundApp:hound_trace' %}">
                     <img id="webhlogo" src="{% static 'WebHoundApp/images/logo_resized.png' %}" width=300>
                 </a>
@@ -27,7 +27,7 @@
                 Unleash your inner hacker and trace any username across the web!
             </div>
             <div class="query-div">
-                <form class="centered-div" method="post">
+                <form class="cent-div" method="post">
                     {% csrf_token %}
                     {{ form.as_p }}
                 </form>
@@ -38,9 +38,9 @@
             <div class="counter-div hacker-cyan">
                 Hounds made {{ traces_cnt }} successful traces so far
             </div>
-            <div class="sherlock-div">
-                <a class="sherlock-logo centered-div" href="https://github.com/sherlock-project/sherlock" target="_blank">
-                    <img id="poweredby" src="{% static 'WebHoundApp/images/powered_by.jpg' %}" alt="Powered by Sherlock" width=150>
+            <div class="sherlock-div hor-cent">
+                <a class="sherlock-logo cent-div" href="https://github.com/sherlock-project/sherlock" target="_blank">
+                    <img id="poweredby" src="{% static 'WebHoundApp/images/powered_by.jpg' %}" alt="Powered by Sherlock" width=75>
                 </a>
             </div>
         </div>
