@@ -11,40 +11,78 @@
     <link href="{% static 'WebHoundApp/css/font-awesome.min.css' %}" rel="stylesheet" media="screen">
 	<link href="{% static 'WebHoundApp/css/animate.css' %}" rel="stylesheet' %}">
 
+    <link href="{% static 'WebHoundApp/css/style.css' %}" rel="stylesheet" media="screen">
+
+    <script src="{% static 'WebHoundApp/js/modernizr.custom.js' %}"></script>
 </head>
 <body>
-    <h1>Trace for: "{{ name }}" | Date initiated: {{ date_friendly }}</h1>
+    <div class="main-div">
+        <div class="name-head hor-cent">
+            <div class="name-info list-text hacker-cyan hor-cent">
+                Trace for: {{ name }}<br>
+                Date initiated: {{ date_friendly }}
+            </div>
+            <div class="name-buttons hor-cent">
+                <!-- Button trigger delete trace modal -->
+                <button type="button" class="btn btn-danger cent-div" data-toggle="modal" data-target="#deleteModal">
+                  Delete Trace
+                </button>
+            </div>
+        </div>
+        <div class="name-body hor-cent">
+                <div style="height: 0.5vh; background-color: #28b0b7; margin: 1vh;"></div>
+                <div class="name-results hor-cent text-cent hacker-cyan">
+                    {% if messages %}
+                    <ul class="messages">
+                        {% for message in messages %}
+                            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
 
-    <!-- Button trigger delete trace modal -->
-    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal">
-      Delete Trace
-    </button>
+                    <script>
+                    function reload(){
+                       window.location.href = "{% url 'WebHoundApp:hound_name' name %}";
+                    }
 
-    <br>
-    <a href="{% url 'WebHoundApp:hound_trace' %}">Back to Homepage</a>
+                    setTimeout(reload, 10000);
+                    </script>
 
-    {% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-        {% endfor %}
-    </ul>
+                    {% else %}
+                        <ul>
+                            {% for result in results %}
+                                <li><a href="{{ result }}" target="_blank">{{ result }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+        </div>
+    </div>
 
-    <script>
-    function reload(){
-       window.location.href = "{% url 'WebHoundApp:hound_name' name %}";
-    }
-
-    setTimeout(reload, 10000);
-    </script>
-
-    {% else %}
-        <ul>
-            {% for result in results %}
-                <li><a href="{{ result }}" target="_blank">{{ result }}</a> </li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+{#    <br>#}
+{#    <a href="{% url 'WebHoundApp:hound_trace' %}">Back to Homepage</a>#}
+{##}
+{#    {% if messages %}#}
+{#    <ul class="messages">#}
+{#        {% for message in messages %}#}
+{#            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>#}
+{#        {% endfor %}#}
+{#    </ul>#}
+{##}
+{#    <script>#}
+{#    function reload(){#}
+{#       window.location.href = "{% url 'WebHoundApp:hound_name' name %}";#}
+{#    }#}
+{##}
+{#    setTimeout(reload, 10000);#}
+{#    </script>#}
+{##}
+{#    {% else %}#}
+{#        <ul>#}
+{#            {% for result in results %}#}
+{#                <li><a href="{{ result }}" target="_blank">{{ result }}</a> </li>#}
+{#            {% endfor %}#}
+{#        </ul>#}
+{#    {% endif %}#}
 
 
 
