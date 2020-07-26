@@ -76,7 +76,7 @@ body {
 .counter-div {
 	height: 2vh;
 	width: 75vw;
-	margin: 1vh 0 1vh 0;
+	margin: 1vh 0 2.5vh 0;
 	position: relative;
 	text-align: center;
 }
@@ -85,8 +85,7 @@ body {
 	height: 10vh;
 	width: 10vw;
 	margin: 1vh 0 0 0;
-	position: absolute;
-	bottom: 0;
+	position: relative;
 }
 
 .sherlock-logo {
