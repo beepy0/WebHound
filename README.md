@@ -6,7 +6,7 @@
 - Libraries: `python -m pip install -r requirements.txt`
 
 ### Code Quality
-- Test: `coverage run --source='WebHoundApp/' manage.py test WebHoundApp` then `coverage report`
+- Test: `coverage run manage.py test WebHoundApp` then `coverage report`
 - Run tests separately: `python manage.py test`
 - Linter: `flake8 --statistics`
 
