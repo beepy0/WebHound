@@ -14,5 +14,6 @@ urlpatterns = [
     path('name/<str:pk>/', HoundName.as_view(), name='hound_name'),
 ]
 
+# reload css changes automatically in debug mode
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, view=cache_control(no_cache=True, must_revalidate=True)(serve))
