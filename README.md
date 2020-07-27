@@ -62,3 +62,11 @@ $ python -m pip install -r requirements.txt
 - Run tests separately: `python manage.py test`
 - Linter: `flake8 --statistics`
 
+## Deploying on Heroku
+The supplied Procfile is sufficient for <a href="https://devcenter.heroku.com/articles/git">deploying on Heroku</a>.
+
+In order to have persistent storate (Heroku will reset sqlite3 data as containers are ephemeral), you need to change to another storage solution, for example Heroku's <a href="https://devcenter.heroku.com/articles/heroku-postgresql"> PostgreSQL add-on</a>.
+
+You also need to change `app` in `celery.py` to use the <a href="https://stackoverflow.com/questions/57440254/heroku-app-cannot-connect-to-celery-worker"> Heroku add-on broker</a>
+
+Last thing you need to configure is change the `root_url` in `config.py` to reflect your website's root url (localhost by default and for dev purposes)
