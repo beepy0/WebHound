@@ -36,19 +36,28 @@ https://branimirs-page.herokuapp.com/webhound/trace/
 - If you close the query page, you can come back to it anytime or just type the same username in the search page.
 
 ## Installation
+```bash
+# clone the repo 
+$ git clone git@github.com:beepy0/WebHound.git
 
-- clone the repo: `git clone git@github.com:beepy0/WebHound.git`
-- change to the project directory: `cd WebHound`
-- install python3 and python3-pip if they are not installed
-- install additional libraries: `python -m pip install -r requirements.txt`
-- install <a href="https://www.rabbitmq.com/">RabbitMQ</a>
+# change to the project directory
+$ cd WebHound
 
-### Run
+# install python3 and python3-pip if they are not installed
+
+# install additional libraries
+$ python -m pip install -r requirements.txt
+
+# install RabbitMQ: https://www.rabbitmq.com/
+```
+
+
+## Run
 - Start server: `python manage.py runserver`
 - Start celery task: `celery -A WebHoundApp worker -l info`
 - Navigate to `https://127.0.0.1:8000/webhound/trace/`
 
-### Code Quality
+## Code Quality
 - Test: `coverage run manage.py test WebHoundApp` then `coverage report`
 - Run tests separately: `python manage.py test`
 - Linter: `flake8 --statistics`
