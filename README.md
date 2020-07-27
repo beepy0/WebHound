@@ -17,6 +17,8 @@
   <a href="#run">Run</a>
   &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
   <a href="#code-quality">Code Quality</a>
+  &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+  <a href="#deploying-on-heroku">Deploying on Heroku</a>
 </p>
 
 <p align="center">
