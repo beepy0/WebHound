@@ -5,13 +5,13 @@ from django.views.decorators.cache import cache_control
 from django.contrib.staticfiles.views import serve
 from django.conf.urls.static import static
 
-from .views import HoundTrace, HoundName, HoundDelete
+from .views import HoundTrace, HoundTraceName, HoundDelete
 
 app_name = 'WebHoundApp'
 urlpatterns = [
     path('trace/', HoundTrace.as_view(), name='hound_trace'),
+    path('trace/<str:pk>/', HoundTraceName.as_view(), name='hound_name'),
     path('delete/<str:pk>/', HoundDelete.as_view(), name='hound_delete'),
-    path('name/<str:pk>/', HoundName.as_view(), name='hound_name'),
 ]
 
 # reload css changes automatically in debug mode

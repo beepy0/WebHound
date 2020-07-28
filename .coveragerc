@@ -1,7 +1,6 @@
 [run]
 branch = True
 include =
-    WebHoundApp/celery.py
     WebHoundApp/views.py
     WebHoundApp/tasks.py
 [paths]

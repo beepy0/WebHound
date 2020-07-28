@@ -132,7 +132,7 @@ class HoundTraceTestCase(ViewTestMixin, TestCase):
 
 
 class HoundQueryTestCase(ViewTestMixin, TestCase):
-    view_class = views.HoundName
+    view_class = views.HoundTraceName
     app_name = 'WebHoundApp'
 
     def test_get_traced(self):

@@ -38,7 +38,7 @@ class HoundTrace(FormView):
         return context
 
 
-class HoundName(generics.GenericAPIView):
+class HoundTraceName(generics.GenericAPIView):
     queryset = Trace.objects.all()
     renderer_classes = [TemplateHTMLRenderer, JSONRenderer]
 
