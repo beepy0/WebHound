@@ -1,10 +1,10 @@
 import pytz
-from shutil import copyfile
 from datetime import datetime, timedelta
 from django.contrib.auth.models import AnonymousUser
 from django.test import RequestFactory, TestCase
 from django.urls import resolve, reverse
 from django.urls.exceptions import Resolver404
+from django.shortcuts import Http404
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 
@@ -38,13 +38,13 @@ class ViewTestMixin(object):
         """
         return {}
 
-    def get_response(self, method, anno, user, data, args, kwargs):
+    def get_response(self, req, anno, user, data, args, kwargs):
         """Creates a request and a response object."""
         factory = RequestFactory()
         req_kwargs = {}
         if data:
             req_kwargs.update({'data': data})
-        req = getattr(factory, method)('/', **req_kwargs)
+        req = getattr(factory, req)('/', **req_kwargs)
         # requests that use messages need extra annotation
         if anno is True:
             self.annotate_req(req)
@@ -112,6 +112,11 @@ class HoundTraceTestCase(ViewTestMixin, TestCase):
     def test_get_template(self):
         self.is_callable(template='hound_trace', route='hound_trace')
 
+    def test_get_no_counter(self):
+        Counter.objects.get(id='traces').delete()
+        with self.assertRaisesMessage(Http404, errors['no_cnt_instance']):
+            self.is_callable()
+
     def test_post(self):
         self.is_callable(req='post')
 
@@ -123,28 +128,37 @@ class HoundTraceTestCase(ViewTestMixin, TestCase):
                          status_code=200)
 
     def test_post_with_data(self):
-        self.is_callable(req='post', data={'query': 'dummy_name'}, to='hound_name',
-                         template='hound_name', route='hound_trace')
+        self.is_callable(req='post', data={'query': 'dummy_name'}, to='hound_name', template='hound_name')
 
 
-class HoundCallBackTestCase(ViewTestMixin, TestCase):
+class HoundQueryTestCase(ViewTestMixin, TestCase):
     view_class = views.HoundName
     app_name = 'WebHoundApp'
 
     def test_get_traced(self):
         name = 'user123'
         self.is_callable(req='get', anno=True, status_code=404, kwargs={'pk': 'no_such_user'})
-
+        # simulates the celery task success result
         Trace(name=name, was_traced=True, data="url1 ; url2 ; url3 ; misc ; ").save()
-        copyfile('WebHoundApp/test_data/user123.csv', cfg_data['sherlock_results_dir'].format(name))
 
         self.is_callable(req='get', anno=True, kwargs={'pk': name}, template='hound_name', route='hound_name')
 
-        resp = self.get_response(method='get', anno=True, user=None, data={}, args=[], kwargs={'pk': name})
+        resp = self.get_response(req='get', anno=True, user=None, data={}, args=[], kwargs={'pk': name})
         self.assertEqual(resp.data['results'], ['url1', 'url2', 'url3'])
 
+    def test_get_traced_but_no_data(self):
+        name = 'user123'
+        Trace(name=name, was_traced=True).save()
+
+        with self.assertRaisesMessage(ValueError, errors['was_traced_no_data']):
+            self.get_response(req='get', anno=True, user=None, data={}, args=[], kwargs={'pk': name})
+
     def test_get_not_traced(self):
-        self.assertFalse(1)
+        name = 'user123'
+        Trace(name=name, was_traced=False).save()
+        resp = self.get_response(req='get', anno=True, user=None, data={}, args=[], kwargs={'pk': name})
+
+        self.assertEqual(resp.data.get('results', ""), "")
 
     def test_post(self):
         Trace(name='dummy_user').save()
@@ -152,16 +166,30 @@ class HoundCallBackTestCase(ViewTestMixin, TestCase):
 
     # TODO test retry trace here
     def test_put(self):
-        ...
+        name = 'user123'
+        Trace(name=name, was_traced=False).save()
+        trace = Trace.objects.get(name=name)
+
+        self.is_callable(req='put', kwargs={'pk': name}, route='hound_name')
+
+        trace.was_traced = True
+        trace.save()
+
+        self.is_callable(req='put', kwargs={'pk': name}, route='hound_name')
 
 
-# TODO tests for HoundDelete view
-    # def test_delete(self):
-    #     Trace(name='dummy_user').save()
-    #     self.is_callable(req='get', anno=True, kwargs={'pk': 'dummy_user'}, template='hound_name', route='hound_name')
-    #     self.is_callable(req='delete', kwargs={'pk': 'dummy_user'},
-    #                      to='hound_deleted', template='hound_deleted', route='hound_deleted')
-    #     self.is_callable(req='get', anno=True, status_code=404, kwargs={'pk': 'dummy_user'})
+class HoundDeleteTestCase(ViewTestMixin, TestCase):
+    view_class = views.HoundDelete
+    app_name = 'WebHoundApp'
+
+    def setUp(self):
+        # redirects to the main page will also need a Counter instance for the template
+        Counter(id='traces').save()
+
+    def test_delete(self):
+        name = 'user123'
+        Trace(name=name).save()
+        self.is_callable(req='post', kwargs={'pk': name}, to='hound_trace', template='hound_trace')
 
 
 class SherlockTaskTestCase(TestCase):

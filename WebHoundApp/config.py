@@ -5,9 +5,11 @@ msgs = {
 }
 
 errors = {
+    'no_cnt_instance': 'No Counter instance in DB. Index page requires a Counter instance with id "traces"',
     'no_trace_name': 'No trace name supplied',
     'no_name_in_db': 'The supplied trace name is not in the database',
     'no_task_ts': 'The task has no (default) timestamp',
+    'was_traced_no_data': 'was_traced is true but no trace results',
     'unknown_sherlock': 'Unexpected branch for sherlock task logic',
 }
 

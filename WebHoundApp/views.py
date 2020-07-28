@@ -1,7 +1,7 @@
-from django.urls import reverse_lazy
+from django.urls import reverse
 from django.views.generic.edit import FormView, DeleteView
 from django.contrib import messages
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, Http404
 from rest_framework import generics
 from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
 from rest_framework.response import Response
@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from .forms import QueryForm
 from .models import Trace, Counter
 from .serializers import TraceSerializer
-from .config import msgs
+from .config import msgs, errors
 from .tasks import trace_with_sherlock
 
 
@@ -21,7 +21,7 @@ class HoundTrace(FormView):
     def form_valid(self, form):
         # call query exec e.g. form.exec_query
         trace_name = form.cleaned_data['query']
-        self.success_url = f"/webhound/name/{trace_name}/"
+        self.success_url = reverse('WebHoundApp:hound_name', kwargs={'pk': trace_name})
 
         if Trace.objects.filter(name=trace_name).count() == 0:
             Trace(name=trace_name).save()
@@ -31,7 +31,10 @@ class HoundTrace(FormView):
 
     def get_context_data(self, **kwargs):
         context = super(HoundTrace, self).get_context_data(**kwargs)
-        context['traces_cnt'] = get_object_or_404(Counter, id='traces').count
+        try:
+            context['traces_cnt'] = get_object_or_404(Counter, id='traces').count
+        except Http404:
+            raise Http404(errors['no_cnt_instance'])
         return context
 
 
@@ -45,19 +48,18 @@ class HoundName(generics.GenericAPIView):
         if context['was_traced'] is False:
             messages.info(request, msgs['trace_not_done'])
         else:
-            try:
-                context['results'] = context['data'][:-2]
-            except Exception:
-                raise ValueError('was_traced is true but no trace results')
+            context['results'] = context['data'][:-2]
+            if context['results'] == []:
+                raise ValueError(errors['was_traced_no_data'])
         return Response(template_name="WebHoundApp/hound_name.html", data=context)
 
     def put(self, request, *args, **kwargs):
         # reserve for retry feature
-        ...
+        return Response(status=200)
 
 
 class HoundDelete(DeleteView):
     model = Trace
 
     def get_success_url(self):
-        return reverse_lazy('WebHoundApp:hound_trace')
+        return reverse('WebHoundApp:hound_trace')
