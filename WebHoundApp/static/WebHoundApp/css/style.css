@@ -1,5 +1,5 @@
 html{
-  height: 100vh;
+	height: 100vh;
 	width: 100vw;
 }
 
@@ -7,7 +7,7 @@ body {
 	background-color:#2f292b;
 	overflow-x: hidden;
 	min-height: 98vh;
-	min-width: 99vw;
+	min-width: 100vw;
 	position: absolute;
 }
 
@@ -16,7 +16,7 @@ body {
 /* ---------------------------------------------- */
 
 .head-div {
-	margin: 3vh 0 12vh 0;
+	margin: 3vh 0 10vh 0;
 	position: relative;
 }
 
@@ -47,12 +47,12 @@ body {
 }
 
 .body-div {
-	margin: 0 0 24vh 0;
+	margin: 0 0 17vh 0;
 	position: relative;
 }
 
 .intro-div {
-	margin: 2vh 0 3vh 0;
+	margin: 2vh 1vh 3vh 1vh;
 	position: relative;
 	text-align: center;
 }
