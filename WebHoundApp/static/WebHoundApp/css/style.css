@@ -1,14 +1,14 @@
 html{
 	height: 100vh;
 	width: 100vw;
+	position: absolute;
 }
 
 body {
 	background-color:#2f292b;
 	overflow-x: hidden;
 	min-height: 98vh;
-	min-width: 100vw;
-	position: absolute;
+	position: relative;
 }
 
 /* ---------------------------------------------- /*
@@ -16,12 +16,13 @@ body {
 /* ---------------------------------------------- */
 
 .head-div {
-	margin: 3vh 0 10vh 0;
+	padding: 3vh 0 0 0;
+	margin: 0 0 10vh 0;
 	position: relative;
 }
 
 .title-div {
-	margin: 1vh 0 2vh 0 !important;
+	margin: 0 0 2vh 0 !important;
 	position: relative;
 }
 
@@ -69,7 +70,7 @@ body {
 }
 
 .counter-div {
-	margin: 1vh 0 3vh 0;
+	margin: 1vh 1vh 3vh 1vh;
 	position: relative;
 	text-align: center;
 }
