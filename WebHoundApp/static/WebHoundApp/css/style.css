@@ -1,32 +1,27 @@
 html{
-  /*height: 100vh;*/
+  height: 100vh;
+	width: 100vw;
 }
 
 body {
 	background-color:#2f292b;
 	overflow-x: hidden;
 	min-height: 98vh;
+	min-width: 99vw;
+	position: absolute;
 }
 
-.main-div {
-	/*width: 75vw;*/
-	/*position: absolute;*/
-	/*top: 50%;*/
-	/*left: 50%;*/
-	/*transform: translate(-50%, -50%);*/
-}
+/* ---------------------------------------------- /*
+ * hound trace page
+/* ---------------------------------------------- */
 
 .head-div {
-	height: 50vh;
-	width: 100vw;
-	margin: 0 0 5vh 0;
+	margin: 3vh 0 12vh 0;
 	position: relative;
 }
 
 .title-div {
-	margin: 1vh 0 0 0 !important;
-	height: 9vh;
-	width: 75vw;
+	margin: 1vh 0 2vh 0 !important;
 	position: relative;
 }
 
@@ -47,58 +42,48 @@ body {
 }
 
 .logo-div {
-	height: 300px;
 	width: 300px;
 	position: relative;
 }
 
 .body-div {
-	height: 16vh;
-	width: 75vw;
-	margin: 0 0 11vh 0;
+	margin: 0 0 24vh 0;
 	position: relative;
 }
 
 .intro-div {
-	height: 4vh;
-	width: 75vw;
-	margin: 2vh 0 2vh 0;
+	margin: 2vh 0 3vh 0;
 	position: relative;
 	text-align: center;
 }
 
 .query-div {
 	height: 40px;
-	margin: 10px 0 10px 0;
+	margin: 1vh 0 1vh 0;
 	position: relative;
 }
 
 .footer-div {
-	height: 14vh;
-	width: 75vw;
 	position: relative;
-	bottom: 0;
+	/*bottom: 0;*/
 }
 
 .counter-div {
-	height: 2vh;
-	width: 75vw;
-	margin: 1vh 0 2.5vh 0;
+	margin: 1vh 0 3vh 0;
 	position: relative;
 	text-align: center;
 }
 
 .sherlock-div {
-	height: 10vh;
-	width: 10vw;
+	width: 75px;
 	margin: 1vh 0 0 0;
 	position: relative;
 }
 
-.sherlock-logo {
-	height: 71px;
-	width: 75px;
-}
+
+/* ---------------------------------------------- /*
+ * hound name page
+/* ---------------------------------------------- */
 
 .name-head {
 	height: 35vh;
